@@ -37,7 +37,7 @@ const Login = () => {
         // Redirigir según el rol
         if (user.rol === "Administrador") {
           console.log('user.rol: ', user.rol)
-          navigate("/admin");
+          navigate("/admin/");
         } else {
           navigate("/home");
         }
