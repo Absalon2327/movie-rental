@@ -5,7 +5,6 @@ import routerUsers from '../routes/users.js';
 import routerLogin from '../routes/auth.js';
 import cors from 'cors';
 import  verifyToken from '../middlewares/authMiddleware.js';
-import uploadsRouter from '../routes/uploads.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(cors());

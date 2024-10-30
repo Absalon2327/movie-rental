@@ -1,17 +1,17 @@
 import express from "express";
 import { db, bucket } from "../src/firebase.js";
-import { v4 as uuidv4 } from 'uuid';
-import dotenv from 'dotenv';
-import { uploadBytes, getDownloadURL } from "firebase/storage";
-import { ref } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
+import dotenv from "dotenv";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import cors from "cors";
 
-const app = express();
 dotenv.config();
+const app = express();
+
 // Middleware para procesar JSON
 app.use(express.json());
-
+app.use(cors());
 // Configurar Multer
-
 
 // Obtener todas las películas
 const getAllMovies = async (req, res) => {
@@ -49,21 +49,28 @@ const getMovieById = async (req, res) => {
 // createMovie modificado
 const createMovie = async (req, res) => {
   try {
-    const { title, description, stock, rental_price, sales_price, available } = req.body;
+    const { title, description, stock, rental_price, sales_price, available } =
+      req.body;
 
+      console.log('req.file: ', req.file);
     if (!req.file) {
       return res.status(400).json({ message: "Imagen es requerida" });
     }
 
-    // Subir imagen a Firebase Storage
-    const storageRef = ref(bucket, `movies/images/${uuidv4()}`);
+    // Crear referencia a la imagen en Firebase Storage
+    const uniqueFileName = `movies/images/${uuidv4()}`;
+    const storageRef = bucket.file(uniqueFileName);
+
     const metadata = {
       contentType: req.file.mimetype,
     };
 
-    await uploadBytes(storageRef, req.file.buffer, metadata);
-    const downloadURL = await getDownloadURL(storageRef);
-
+    // Subir imagen a Firebase Storage
+    await storageRef.save(req.file.buffer, { metadata });
+    const downloadURL = await storageRef.getSignedUrl({
+      action: "read",
+      expires: "03-17-2025", // Fecha de expiración del enlace
+    });
     // Guardar URL de la imagen en Firestore
     const newMovie = {
       title,
@@ -72,23 +79,31 @@ const createMovie = async (req, res) => {
       rental_price,
       sales_price,
       available,
-      imageUrl: downloadURL,
+      imageUrl: downloadURL[0],
     };
 
-    await db.collection('movies').add(newMovie);
+    await db.collection("movies").add(newMovie);
 
-    res.status(201).json({ message: "Película creada exitosamente", movie: newMovie });
+    res
+      .status(201)
+      .json({ message: "Película creada exitosamente", movie: newMovie });
   } catch (error) {
-    res.status(500).json({ message: "Error al crear la película", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error al crear la película", error: error.message });
   }
 };
-
 
 // Actualizar una película por ID (solo admin)
 const updateMovie = async (req, res) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
+    const { title, description, stock, rental_price, sales_price, available } =
+      req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Imagen es requerida" });
+    }
 
     const movieRef = db.collection("movies").doc(id);
     const movieDoc = await movieRef.get();
@@ -97,6 +112,29 @@ const updateMovie = async (req, res) => {
       return res.status(404).json({ message: "Movie not found" });
     }
 
+    const uniqueFileName = `movies/images/${uuidv4()}`;
+    const storageRef = bucket.file(uniqueFileName);
+
+    const metadata = {
+      contentType: req.file.mimetype,
+    };
+
+    // Subir imagen a Firebase Storage
+    await storageRef.save(req.file.buffer, { metadata });
+    const downloadURL = await storageRef.getSignedUrl({
+      action: "read",
+      expires: "03-17-2025", // Fecha de expiración del enlace
+    });
+    // Guardar URL de la imagen en Firestore
+    const updates = {
+      title,
+      description,
+      stock,
+      rental_price,
+      sales_price,
+      available,
+      imageUrl: downloadURL[0],
+    };
     await movieRef.update({
       ...updates,
       updated_at: new Date().toISOString(),

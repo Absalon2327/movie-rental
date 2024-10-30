@@ -1,7 +1,7 @@
 import express from "express";
 import verifyToken from "../middlewares/authMiddleware.js";
 import multer from "multer";
-import path from "path";
+
 import cors from "cors";
 const app = express();
 app.use(cors());
@@ -23,18 +23,7 @@ import {
   deleteMovie,
 } from "../controllers/movieController.js";
 
-// Configuración de multer
-/* const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'public/uploads/');
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-  });
   
-  const upload = multer({ storage: storage }); */
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 // Obtener todas las películas
@@ -44,10 +33,10 @@ routerMovies.get("/movies", getAllMovies);
 routerMovies.get("/movies/:id", getMovieById);
 
 // Añadir una película (Solo Admin)
-routerMovies.post("/movies", upload.single("image"), createMovie);
+routerMovies.post("/movies", upload.single("imageUrl"), createMovie);
 
 // Modificar una película (Solo Admin)
-routerMovies.put("/movies/:id", verifyToken, updateMovie);
+routerMovies.put("/movies/:id", upload.single("imageUrl"), verifyToken, updateMovie);
 
 // Eliminar una película (Solo Admin)
 routerMovies.delete("/movies/:id", verifyToken, deleteMovie);
