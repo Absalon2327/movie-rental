@@ -9,6 +9,7 @@ import {
   Navbar,
   Nav,
   Carousel,
+  Form
 } from "react-bootstrap";
 import axios from "axios";
 
@@ -87,7 +88,7 @@ const Home = () => {
                   <Card className="text-center">
                     <Card.Img
                       variant="top"
-                      src={`${movie.image}`}
+                      src={`${movie.imageUrl}`}
                       alt={movie.title}
                       style={{ height: "200px", objectFit: "cover" }}
                     />

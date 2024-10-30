@@ -201,34 +201,58 @@ const Home = () => {
             <Carousel.Item key={movie.id}>
               <Row className="justify-content-center">
                 <Col md={4}>
-                  <Card className="text-center">
-                    <Card.Img
-                      variant="top"
-                      src={`${movie.image}`}
-                      alt={movie.title}
-                      style={{ height: "200px", objectFit: "cover" }}
-                    />
-                    <Card.Body>
-                      <Card.Title>{movie.title}</Card.Title>
-                      <Card.Text>{movie.description}</Card.Text>
+                  <Card
+                    className="text-center"
+                    style={{ width: "300px", height: "400px" }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                        height: "60%", // Ocupa 60% de la tarjeta para centrar la imagen verticalmente
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Card.Img
+                        className="text-center mt-3"
+                        variant="top"
+                        src={`${movie.imageUrl}`}
+                        alt={movie.title}
+                        style={{
+                          width: "auto", // Ajusta la anchura de la imagen automáticamente
+                          height: "100%", // La imagen ocupa la altura completa de este contenedor
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
+                    <Card.Body style={{ height: "40%", overflow: "hidden" }}>
+                      <Card.Title style={{ fontSize: "14px" }}>
+                        {movie.title}
+                      </Card.Title>
+                      <Card.Text style={{ fontSize: "12px" }}>
+                        {movie.description}
+                      </Card.Text>
                       <Button
                         variant="outline-primary"
                         onClick={() => handleLike(movie.id)}
+                        style={{ fontSize: "12px" }}
                       >
                         👍 {likes[movie.id] || 0} Likes
                       </Button>
                       <Button
                         variant="outline-primary"
                         onClick={() => handleSales(movie)}
+                        style={{ fontSize: "12px" }}
                       >
-                        {" "}
                         Comprar
                       </Button>
                       <Button
                         variant="outline-primary"
                         onClick={() => handleRental(movie)}
+                        style={{ fontSize: "12px" }}
                       >
-                        {" "}
                         Alquilar
                       </Button>
                     </Card.Body>
@@ -247,7 +271,7 @@ const Home = () => {
           <Modal.Body>
             <Form>
               <Row>
-                <Col className="col-6">
+                <Col className="col-12">
                   <Form.Group className="mb-3">
                     <Form.Label>Película</Form.Label>
                     <Form.Control
@@ -263,6 +287,8 @@ const Home = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
+              </Row>
+              <Row>
                 <Col className="col-6">
                   <Form.Group className="mb-3">
                     <Form.Label>Stock</Form.Label>
@@ -279,8 +305,6 @@ const Home = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
-              </Row>
-              <Row>
                 <Col className="col-6">
                   <Form.Group className="mb-3">
                     <Form.Label>Precio $</Form.Label>
@@ -297,27 +321,10 @@ const Home = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
-                <Col className="col-6">
-                  <Form.Group className="mb-3">
-                    <Form.Label>Método de pago</Form.Label>
-                    <Form.Select
-                      aria-label="Rol"
-                      name="rol"
-                      onChange={handleInputChange}
-                      isInvalid={!!errors.rol}
-                      value={formData.rol}
-                    >
-                      <option value="">Seleccione</option>{" "}
-                      <option value="efectivo">Efectivo en tienda</option>
-                      <option value="tarjeta">Tarjeta</option>
-                    </Form.Select>
-                    <Form.Control.Feedback type="invalid">
-                      {errors.rental_price}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
               </Row>
+              <hr />
               <Row>
+              <h4 className="text-center mb-4">Pago</h4>
                 <Col className="col-6">
                   <Form.Group className="mb-3">
                     <Form.Label>Nombre según tarjeta</Form.Label>
